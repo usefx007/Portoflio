@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard & CMS | Youssef Ali Portfolio</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script>
+    // Automatically load admin view on direct access to /admin or admin.html
+    window.addEventListener("DOMContentLoaded", () => {
+      window.location.hash = "admin";
+    });
+  </script>
+</head>
+<body style="background: #05070D; color: #F1F5F9; font-family: 'Inter', sans-serif;">
+  <script>
+    window.location.replace("index.html#admin");
+  </script>
+  <div style="display: flex; align-items: center; justify-content: center; height: 100vh;">
+    <p style="color: #8B9BB0;">Opening Secure Admin CMS... <a href="index.html#admin" style="color: #3B82C4;">Click here if not redirected</a></p>
+  </div>
+</body>
+</html>
