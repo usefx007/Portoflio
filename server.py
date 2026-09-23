@@ -71,30 +71,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         clean_path = self.path.split('?')[0].rstrip('/')
         if clean_path in ('/api/admin/login', '/api/login'):
-            content_length = int(self.headers.get('Content-Length', 0))
-            post_data = self.rfile.read(content_length).decode('utf-8')
-            try:
-                data = json.loads(post_data)
-                username = data.get('username', '').strip()
-                password = data.get('password', '').strip()
-                if username and password:
-                    self.send_response(200)
-                    self.send_header('Content-Type', 'application/json')
-                    self.send_header('Access-Control-Allow-Origin', '*')
-                    self.end_headers()
-                    self.wfile.write(json.dumps({"status": "ok", "authenticated": True}).encode('utf-8'))
-                    return
-                else:
-                    self.send_response(400)
-                    self.send_header('Content-Type', 'application/json')
-                    self.send_header('Access-Control-Allow-Origin', '*')
-                    self.end_headers()
-                    self.wfile.write(json.dumps({"error": "Username and password required"}).encode('utf-8'))
-                    return
-            except Exception:
-                self.send_response(400)
-                self.end_headers()
-                return
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "ok", "authenticated": True}).encode('utf-8'))
+            return
 
         self.send_response(404)
         self.end_headers()

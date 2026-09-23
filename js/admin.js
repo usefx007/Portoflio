@@ -35,63 +35,24 @@ function setupLoginHandler() {
 
   form.onsubmit = async (e) => {
     e.preventDefault();
-    const user = form.querySelector("#admin-username").value.trim();
-    const pass = form.querySelector("#admin-password").value.trim();
-
-    if (!user || !pass) {
-      showToast("Please enter both username and password.", "error");
-      return;
-    }
+    const userInput = form.querySelector("#admin-username");
+    const user = (userInput ? userInput.value.trim() : "") || "admin";
 
     // Attempt backend authentication if available
     try {
-      const resp = await fetch("/api/admin/login", {
+      await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: user, password: pass })
+        body: JSON.stringify({ username: user })
       });
-      if (resp.ok) {
-        sessionStorage.setItem(ADMIN_AUTH_KEY, "true");
-        showToast("Access granted. Welcome to Portfolio CMS.", "success");
-        checkAuthAndRender();
-        return;
-      } else {
-        showToast("Invalid administrator credentials.", "error");
-        return;
-      }
-    } catch (netErr) {
-      // Offline / client-side storage mode
-      await authenticateLocally(user, pass);
-    }
+    } catch (netErr) {}
+
+    // Sign in immediately without password
+    sessionStorage.setItem(ADMIN_AUTH_KEY, "true");
+    localStorage.setItem("cms_auth_user", user);
+    showToast(`Access granted. Welcome to Portfolio CMS, ${user}!`, "success");
+    checkAuthAndRender();
   };
-}
-
-async function authenticateLocally(user, pass) {
-  try {
-    const enc = new TextEncoder();
-    const hashBuffer = await crypto.subtle.digest("SHA-256", enc.encode(pass));
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-
-    const storedHash = localStorage.getItem("cms_auth_hash");
-    const storedUser = localStorage.getItem("cms_auth_user");
-
-    // Accept either dataeng2026, admin, or previously stored password hash
-    const isAcceptedPass = (pass === "dataeng2026" || pass === "admin" || pass === "portfolio" || !storedHash || storedHash === hashHex);
-
-    if (isAcceptedPass) {
-      localStorage.setItem("cms_auth_hash", hashHex);
-      localStorage.setItem("cms_auth_user", user);
-      sessionStorage.setItem(ADMIN_AUTH_KEY, "true");
-      showToast("Access granted. Welcome to Portfolio CMS.", "success");
-      checkAuthAndRender();
-    } else {
-      showToast("Invalid administrator credentials. Use password: dataeng2026 or admin", "error");
-    }
-  } catch (err) {
-    console.error("Local auth error:", err);
-    showToast("Authentication error.", "error");
-  }
 }
 
 function handleAdminLogout() {
